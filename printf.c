@@ -5,17 +5,12 @@
 #include <string.h>
 #include <limits.h>
 
-static void	ft_putchar(char c)
-{
-	write(1, &c, 1);
-}
-
-void	ft_putstr(char *s)
+static void	ft_putstr(char *s)
 {
 	if (s == NULL)
 		return ;
 	while (*s)
-		ft_putchar(*s++);
+		write(1, s++, 1);
 }
 
 static int num_len(int n)
@@ -38,52 +33,27 @@ static int num_len(int n)
 	return (len);
 }
 
-static int	to_unsigned(long long n)
+static int converter(long long n, char iden, int base)
 {
 	unsigned int nb;
-	char	c[10];
-	short	i;
+	char c[12];
+	short i;
 	int count;
 
-	i = 0;
 	nb = (unsigned int)n;
-	 if (nb == 0)
-    {
-        write(1, "0", 1);
-        return (1);
-    }
-	while (nb)
+	if (nb == 0)
 	{
-		c[i++] = (nb % 10) + 48;
-		nb /= 10;
+		write(1, "0", 1);
+		return (1);
 	}
-	count = i;
-	while (i)
-		write(1, &c[--i], 1);
-	return (count);
-}
-
-static int	to_hex(long long n)
-{
-	unsigned int nb;
-	char	c[8];
-	short	i;
-	int count;
-
 	i = 0;
-	nb = (unsigned int)n;
-	 if (nb == 0)
-    {
-        write(1, "0", 1);
-        return (1);
-    }
 	while (nb)
 	{
-		if (nb % 16 < 10)
-			c[i++] = nb % 16 + 48;
+		if (nb % base < 10)
+			c[i++] = nb % base + '0';
 		else
-			c[i++] = 'a' + nb % 16 - 10;
-		nb /= 16;
+			c[i++] = 'a' - ('x' - iden) + nb % base - 10;
+		nb /= base;
 	}
 	count = i;
 	while (i)
@@ -129,7 +99,7 @@ int	ft_printf(const char *format, ...)
 			char c;
 
 			c = va_arg(args, int);
-			ft_putchar(c);
+			ft_putstr(&c);
 			printed_chars++;
 			format += 2;
 			continue ;
@@ -167,16 +137,16 @@ int	ft_printf(const char *format, ...)
 			long long u;
 
 			u = va_arg(args, long long);
-			printed_chars += to_unsigned(u);
+			printed_chars += converter(u, 0, 10);
 			format += 2;
 			continue;
 		}
-		else if (*format == '%' && *(format + 1) == 'x')
+		else if (*format == '%' && (*(format + 1) == 'x' || *(format + 1) == 'X'))
 		{
 			long long hx;
 
 			hx = va_arg(args, long long);
-			printed_chars += to_hex(hx);
+			printed_chars += converter(hx, *(format + 1), 16);
 			format += 2;
 			continue;
 		}
@@ -195,9 +165,16 @@ int	ft_printf(const char *format, ...)
 			format += 2;
 			continue;
 		}
+		else if (*format == '%' && *(format + 1) == '%')
+		{
+			write(1, "%", 1);
+			printed_chars++;
+			format += 2;
+			continue;
+		}
 		else
 		{
-			ft_putchar(*format);
+			write(1, format, 1);
 			printed_chars++;
 			format++;
 		}
@@ -208,9 +185,15 @@ int	ft_printf(const char *format, ...)
 
 int main() {
     // Character Tests
-    /*printf("%%c Tests:\n");
+    printf("%%c Tests:\n");
     printf("Standard: |%c|\n", 'A');
     ft_printf("Custom:   |%c|\n", 'A');
+
+	char c = 'A';
+	printf("%c\n", 'c');
+	ft_printf("%c\n", 'c');
+	printf("%c\n", c);
+	ft_printf("%c\n", c);
 
     // String Tests
     printf("%%s Tests:\n");
@@ -242,16 +225,28 @@ int main() {
     printf("Standard: %u\n", ULONG_MAX);
     ft_printf("Custom:   %u\n", ULONG_MAX);
 
-	printf("%x\n", LLONG_MIN);
-	ft_printf("%x\n", LLONG_MIN);*/
+	printf("%X\n", 202425);
+	ft_printf("%X\n", 202425);
 
-	 int x = 42;
-    int *ptr = 0;
+	printf("%X\n", 369852147);
+	ft_printf("%X\n", 369852147);
 
-    printf("Standard: %p\n", ptr);
-    ft_printf("Custom:   %p\n", ptr);
+	int a = 43;
+	float x = 2.00;
+    int *ptr1 = &a;
+	float *ptr2 = &x;
+	void *p = &a;
+
+    printf("Standard: %p %p %p\n", ptr1, ptr2, p);
+    ft_printf("Custom:   %p %p %p\n", ptr1, ptr2, p);
 
     printf("Standard: %p\n", NULL);
     ft_printf("Custom:   %p\n", NULL);
+
+	printf("Standard: %d %u %x %p\n", INT_MIN, ULONG_MAX, LLONG_MIN, NULL);
+	ft_printf("Custom:   %d %u %x %p\n", INT_MIN, ULONG_MAX, LLONG_MIN, NULL);
+
+	printf("%%\n");
+	ft_printf("%%\n");
     return 0;
 }
