@@ -5,12 +5,22 @@
 #include <string.h>
 #include <limits.h>
 
-static void	ft_putstr(char *s)
+static void	ft_putstr_or_char(void *content, int is_char)
 {
-	if (s == NULL)
+	if (content == NULL)
 		return ;
-	while (*s)
-		write(1, s++, 1);
+	
+	if (is_char)
+	{
+		char c = *(char *)content;
+		write(1, &c, 1);
+	}
+	else
+	{
+		char *s = (char *)content;
+		while (*s)
+			write(1, s++, 1);
+	}
 }
 
 static int num_len(int n)
@@ -99,10 +109,9 @@ int	ft_printf(const char *format, ...)
 			char c;
 
 			c = va_arg(args, int);
-			ft_putstr(&c);
+			ft_putstr_or_char(&c, 1);
 			printed_chars++;
 			format += 2;
-			continue ;
 		}
 		else if (*format == '%' && *(format + 1) == 's')
 		{
@@ -116,11 +125,10 @@ int	ft_printf(const char *format, ...)
     		}
 			else
 			{
-				ft_putstr(s);
+				ft_putstr_or_char(s, 0);
 				printed_chars += ft_strlen(s);
 			}
 			format += 2;
-			continue;
 		}
 		else if (*format == '%' && (*(format + 1) == 'd' || *(format + 1) == 'i'))
 		{
@@ -130,7 +138,6 @@ int	ft_printf(const char *format, ...)
 			ft_putnbr_fd(d, 1);
 			printed_chars += num_len(d);
 			format +=2;
-			continue;
 		}
 		else if (*format == '%' && *(format + 1) == 'u')
 		{
@@ -139,7 +146,6 @@ int	ft_printf(const char *format, ...)
 			u = va_arg(args, long long);
 			printed_chars += converter(u, 0, 10);
 			format += 2;
-			continue;
 		}
 		else if (*format == '%' && (*(format + 1) == 'x' || *(format + 1) == 'X'))
 		{
@@ -148,7 +154,6 @@ int	ft_printf(const char *format, ...)
 			hx = va_arg(args, long long);
 			printed_chars += converter(hx, *(format + 1), 16);
 			format += 2;
-			continue;
 		}
 		else if (*format == '%' && *(format + 1) == 'p')
 		{
@@ -163,14 +168,12 @@ int	ft_printf(const char *format, ...)
 			else
 				printed_chars += to_address(addr);			
 			format += 2;
-			continue;
 		}
 		else if (*format == '%' && *(format + 1) == '%')
 		{
 			write(1, "%", 1);
 			printed_chars++;
 			format += 2;
-			continue;
 		}
 		else
 		{
@@ -185,7 +188,7 @@ int	ft_printf(const char *format, ...)
 
 int main() {
     // Character Tests
-    printf("%%c Tests:\n");
+    /*printf("%%c Tests:\n");
     printf("Standard: |%c|\n", 'A');
     ft_printf("Custom:   |%c|\n", 'A');
 
@@ -247,6 +250,18 @@ int main() {
 	ft_printf("Custom:   %d %u %x %p\n", INT_MIN, ULONG_MAX, LLONG_MIN, NULL);
 
 	printf("%%\n");
-	ft_printf("%%\n");
+	ft_printf("%%\n");*/
+
+	int a, b, c;
+
+	a = ft_strlen(ft_itoa(88)) + 1;
+	ft_itoa(8832356961);
+	printf("\n");
+	printf("%d\n", a);
+
+	c = printf("%d\n", 8832356961);
+	printf("%d\n", c);
+	b = ft_printf("%d\n", 8832356961);
+	printf("%d\n", b);
     return 0;
 }
