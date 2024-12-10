@@ -63,6 +63,58 @@ static int	to_unsigned(long long n)
 	return (count);
 }
 
+static int	to_hex(long long n)
+{
+	unsigned int nb;
+	char	c[8];
+	short	i;
+	int count;
+
+	i = 0;
+	nb = (unsigned int)n;
+	 if (nb == 0)
+    {
+        write(1, "0", 1);
+        return (1);
+    }
+	while (nb)
+	{
+		if (nb % 16 < 10)
+			c[i++] = nb % 16 + 48;
+		else
+			c[i++] = 'a' + nb % 16 - 10;
+		nb /= 16;
+	}
+	count = i;
+	while (i)
+		write(1, &c[--i], 1);
+	return (count);
+}
+
+static int	to_address(long long n)
+{
+	unsigned long nb;
+	char	c[16];
+	short	i;
+	int count;
+
+	i = 0;
+	nb = (unsigned long)n;
+	write(1, "0x", 2);
+	while (nb)
+	{
+		if (nb % 16 < 10)
+			c[i++] = nb % 16 + 48;
+		else
+			c[i++] = 'a' + nb % 16 - 10;
+		nb /= 16;
+	}
+	count = i + 2;
+	while (i)
+		write(1, &c[--i], 1);
+	return (count);
+}
+
 int	ft_printf(const char *format, ...)
 {
 	va_list	args;
@@ -119,6 +171,30 @@ int	ft_printf(const char *format, ...)
 			format += 2;
 			continue;
 		}
+		else if (*format == '%' && *(format + 1) == 'x')
+		{
+			long long hx;
+
+			hx = va_arg(args, long long);
+			printed_chars += to_hex(hx);
+			format += 2;
+			continue;
+		}
+		else if (*format == '%' && *(format + 1) == 'p')
+		{
+			long long addr;
+
+			addr = va_arg(args, long long);
+			if (addr == 0)
+			{
+				write(1, "(nil)", 5);
+        		printed_chars += 5;
+			}
+			else
+				printed_chars += to_address(addr);			
+			format += 2;
+			continue;
+		}
 		else
 		{
 			ft_putchar(*format);
@@ -132,7 +208,7 @@ int	ft_printf(const char *format, ...)
 
 int main() {
     // Character Tests
-    printf("%%c Tests:\n");
+    /*printf("%%c Tests:\n");
     printf("Standard: |%c|\n", 'A');
     ft_printf("Custom:   |%c|\n", 'A');
 
@@ -166,5 +242,16 @@ int main() {
     printf("Standard: %u\n", ULONG_MAX);
     ft_printf("Custom:   %u\n", ULONG_MAX);
 
+	printf("%x\n", LLONG_MIN);
+	ft_printf("%x\n", LLONG_MIN);*/
+
+	 int x = 42;
+    int *ptr = 0;
+
+    printf("Standard: %p\n", ptr);
+    ft_printf("Custom:   %p\n", ptr);
+
+    printf("Standard: %p\n", NULL);
+    ft_printf("Custom:   %p\n", NULL);
     return 0;
 }
