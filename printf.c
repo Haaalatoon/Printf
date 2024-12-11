@@ -39,46 +39,33 @@ static int	handle_cors(va_list args, char id)
 	}
 }
 
-static int	num_len(int n)
+static int	write_number(long long nb, char iden, int base, int prefix)
 {
-	int	len;
-
-	len = 0;
-	if (n == 0)
-		return (1);
-	if (n < 0)
-	{
-		++len;
-		n = -n;
-	}
-	while (n)
-	{
-		n /= 10;
-		++len;
-	}
-	return (len);
-}
-
-static int	write_number(unsigned long long nb, char iden, int base, int prefix)
-{
-	char	c[16];
-	short	i;
-	int		count;
+	char				c[32];
+	short				i;
+	int					count;
+	unsigned long long	unb;
 
 	i = 0;
+	count = 0;
 	if (prefix)
 		count = write(1, "0x", 2);
-	else
-		count = 0;
-	if (nb == 0)
-		return (count + write(1, "0", 1));
-	while (nb)
+	if (base == 10 && nb < 0)
 	{
-		if (nb % base < 10)
-			c[i++] = nb % base + '0';
+		count += write(1, "-", 1);
+		unb = -nb;
+	}
+	else
+		unb = nb;
+	if (unb == 0)
+		return (count + write(1, "0", 1));
+	while (unb)
+	{
+		if (unb % base < 10)
+			c[i++] = unb % base + '0';
 		else
-			c[i++] = 'a' - ('x' - iden) + nb % base - 10;
-		nb /= base;
+			c[i++] = 'a' - ('x' - iden) + unb % base - 10;
+		unb /= base;
 	}
 	count += i;
 	while (i)
@@ -88,37 +75,34 @@ static int	write_number(unsigned long long nb, char iden, int base, int prefix)
 
 int	handle_format(va_list args, char format)
 {
-	int				printed_chars;
 	int				d;
 	unsigned int	num;
 	void			*addr;
 
-	printed_chars = 0;
 	if (format == 'd' || format == 'i')
 	{
 		d = va_arg(args, int);
-		ft_putnbr_fd(d, 1);
-		return (num_len(d));
+		return (write_number(d, 0, 10, 0));
 	}
 	if (format == 'u')
 	{
 		num = va_arg(args, unsigned int);
-		printed_chars += write_number(num, 0, 10, 0);
+		return (write_number(num, 0, 10, 0));
 	}
 	else if (format == 'x' || format == 'X')
 	{
 		num = va_arg(args, unsigned int);
-		printed_chars += write_number(num, format, 16, 0);
+		return (write_number(num, format, 16, 0));
 	}
 	else if (format == 'p')
 	{
 		addr = va_arg(args, void *);
 		if (addr == NULL)
-			printed_chars += write(1, "(nil)", 5);
+			return (write(1, "(nil)", 5));
 		else
-			printed_chars += write_number((unsigned long long)addr, 'x', 16, 1);
+			return (write_number((unsigned long long)addr, 'x', 16, 1));
 	}
-	return (printed_chars);
+	return (0);
 }
 
 int	ft_printf(const char *format, ...)
