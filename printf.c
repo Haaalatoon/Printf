@@ -39,7 +39,7 @@ static int	handle_cors(va_list args, char id)
 	}
 }
 
-static int	write_number(long long nb, char iden, int base, int prefix)
+static int	write_number(long long nb, char iden, int base)
 {
 	char				c[32];
 	short				i;
@@ -48,15 +48,12 @@ static int	write_number(long long nb, char iden, int base, int prefix)
 
 	i = 0;
 	count = 0;
-	if (prefix)
-		count = write(1, "0x", 2);
+	unb = nb;
 	if (base == 10 && nb < 0)
 	{
 		count += write(1, "-", 1);
 		unb = -nb;
 	}
-	else
-		unb = nb;
 	if (unb == 0)
 		return (count + write(1, "0", 1));
 	while (unb)
@@ -67,9 +64,8 @@ static int	write_number(long long nb, char iden, int base, int prefix)
 			c[i++] = 'a' - ('x' - iden) + unb % base - 10;
 		unb /= base;
 	}
-	count += i;
 	while (i)
-		write(1, &c[--i], 1);
+		count += write(1, &c[--i], 1);
 	return (count);
 }
 
@@ -80,27 +76,22 @@ int	handle_format(va_list args, char format)
 	void			*addr;
 
 	if (format == 'd' || format == 'i')
-	{
-		d = va_arg(args, int);
-		return (write_number(d, 0, 10, 0));
-	}
+		return (d = va_arg(args, int), write_number(d, 0, 10));
 	if (format == 'u')
-	{
-		num = va_arg(args, unsigned int);
-		return (write_number(num, 0, 10, 0));
-	}
+		return (num = va_arg(args, unsigned int), write_number(num, 0, 10));
 	else if (format == 'x' || format == 'X')
-	{
-		num = va_arg(args, unsigned int);
-		return (write_number(num, format, 16, 0));
-	}
+		return (num = va_arg(args, unsigned int),
+			write_number(num, format, 16));
 	else if (format == 'p')
 	{
 		addr = va_arg(args, void *);
 		if (addr == NULL)
 			return (write(1, "(nil)", 5));
 		else
-			return (write_number((unsigned long long)addr, 'x', 16, 1));
+		{
+			write(1, "0x", 2);
+			return (write_number((unsigned long long)addr, 'x', 16));
+		}
 	}
 	return (0);
 }
@@ -120,7 +111,7 @@ int	ft_printf(const char *format, ...)
 			if (*format == 'c' || *format == 's')
 				printed_chars += handle_cors(args, *format);
 			else if (*format == 'd' || *format == 'i' || *format == 'x'
-					|| *format == 'X' || *format == 'u' || *format == 'p')
+				|| *format == 'X' || *format == 'u' || *format == 'p')
 				handle_format(args, *format);
 			else if (*format == '%')
 				printed_chars += write(1, "%", 1);
@@ -133,7 +124,7 @@ int	ft_printf(const char *format, ...)
 	return (printed_chars);
 }
 
-/*int	main(void)
+int	main(void)
 {
 	int		a;
 	float	x;
@@ -188,4 +179,3 @@ int	ft_printf(const char *format, ...)
 	ft_printf("%p\n", NULL);
 	return (0);
 }
-*/
