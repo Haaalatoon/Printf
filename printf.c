@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   printf.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hrhilane <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/11 16:40:12 by hrhilane          #+#    #+#             */
+/*   Updated: 2024/12/11 16:40:14 by hrhilane         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -7,25 +19,27 @@
 
 static void	ft_putstr_or_char(void *content, int is_char)
 {
+	char	c;
+	char	*s;
+
 	if (content == NULL)
 		return ;
-	
 	if (is_char)
 	{
-		char c = *(char *)content;
+		c = *(char *)content;
 		write(1, &c, 1);
 	}
 	else
 	{
-		char *s = (char *)content;
+		s = (char *)content;
 		while (*s)
 			write(1, s++, 1);
 	}
 }
 
-static int num_len(int n)
+static int	num_len(int n)
 {
-	int len;
+	int	len;
 
 	len = 0;
 	if (n == 0)
@@ -43,20 +57,19 @@ static int num_len(int n)
 	return (len);
 }
 
-static int converter(long long n, char iden, int base)
+static int	write_number(unsigned long long nb, char iden, int base, int prefix)
 {
-	unsigned int nb;
-	char c[12];
-	short i;
-	int count;
+	char	c[16];
+	short	i;
+	int		count;
 
-	nb = (unsigned int)n;
-	if (nb == 0)
-	{
-		write(1, "0", 1);
-		return (1);
-	}
 	i = 0;
+	if (prefix)
+		count = write(1, "0x", 2);
+	else
+		count = 0;
+	if (nb == 0)
+		return (count + write(1, "0", 1));
 	while (nb)
 	{
 		if (nb % base < 10)
@@ -65,31 +78,7 @@ static int converter(long long n, char iden, int base)
 			c[i++] = 'a' - ('x' - iden) + nb % base - 10;
 		nb /= base;
 	}
-	count = i;
-	while (i)
-		write(1, &c[--i], 1);
-	return (count);
-}
-
-static int	to_address(long long n)
-{
-	unsigned long nb;
-	char	c[16];
-	short	i;
-	int count;
-
-	i = 0;
-	nb = (unsigned long)n;
-	write(1, "0x", 2);
-	while (nb)
-	{
-		if (nb % 16 < 10)
-			c[i++] = nb % 16 + 48;
-		else
-			c[i++] = 'a' + nb % 16 - 10;
-		nb /= 16;
-	}
-	count = i + 2;
+	count += i;
 	while (i)
 		write(1, &c[--i], 1);
 	return (count);
@@ -99,104 +88,72 @@ int	ft_printf(const char *format, ...)
 {
 	va_list	args;
 	int		printed_chars;
+	char	c;
+	char	*s;
+	int		d;
+	void	*addr;
 
 	va_start(args, format);
 	printed_chars = 0;
 	while (*format)
 	{
-		if (*format == '%' && *(format + 1) == 'c')
+		if (*format == '%')
 		{
-			char c;
-
-			c = va_arg(args, int);
-			ft_putstr_or_char(&c, 1);
-			printed_chars++;
-			format += 2;
-		}
-		else if (*format == '%' && *(format + 1) == 's')
-		{
-			char *s;
-
-			s = va_arg(args, char *);
-			if (s == NULL)
-    		{
-        		write(1, "(null)", 6);
-        		printed_chars += 6;
-    		}
-			else
+			format++;
+			if (*format == 'c')
 			{
-				ft_putstr_or_char(s, 0);
-				printed_chars += ft_strlen(s);
+				c = (char)va_arg(args, int);
+				ft_putstr_or_char(&c, 1);
+				printed_chars++;
 			}
-			format += 2;
-		}
-		else if (*format == '%' && (*(format + 1) == 'd' || *(format + 1) == 'i'))
-		{
-			int d;
-
-			d = va_arg(args, int);
-			ft_putnbr_fd(d, 1);
-			printed_chars += num_len(d);
-			format +=2;
-		}
-		else if (*format == '%' && *(format + 1) == 'u')
-		{
-			long long u;
-
-			u = va_arg(args, long long);
-			printed_chars += converter(u, 0, 10);
-			format += 2;
-		}
-		else if (*format == '%' && (*(format + 1) == 'x' || *(format + 1) == 'X'))
-		{
-			long long hx;
-
-			hx = va_arg(args, long long);
-			printed_chars += converter(hx, *(format + 1), 16);
-			format += 2;
-		}
-		else if (*format == '%' && *(format + 1) == 'p')
-		{
-			long long addr;
-
-			addr = va_arg(args, long long);
-			if (addr == 0)
+			else if (*format == 's')
 			{
-				write(1, "(nil)", 5);
-        		printed_chars += 5;
+				s = va_arg(args, char *);
+				if (s == NULL)
+					printed_chars += write(1, "(null)", 6);
+				else
+				{
+					ft_putstr_or_char(s, 0);
+					printed_chars += ft_strlen(s);
+				}
 			}
-			else
-				printed_chars += to_address(addr);			
-			format += 2;
-		}
-		else if (*format == '%' && *(format + 1) == '%')
-		{
-			write(1, "%", 1);
-			printed_chars++;
-			format += 2;
-		}
-		else
-		{
-			write(1, format, 1);
-			printed_chars++;
+			else if (*format == 'd' || *format == 'i')
+			{
+				d = va_arg(args, int);
+				ft_putnbr_fd(d, 1);
+				printed_chars += num_len(d);
+			}
+			else if (*format == 'u')
+				printed_chars += write_number(va_arg(args, unsigned int), 0, 10,
+						0);
+			else if (*format == 'x' || *format == 'X')
+				printed_chars += write_number(va_arg(args, unsigned int),
+						*format, 16, 0);
+			else if (*format == 'p')
+			{
+				addr = va_arg(args, void *);
+				if (addr == NULL)
+					printed_chars += write(1, "(nil)", 5);
+				else
+					printed_chars += write_number((unsigned long long)addr, 'x',
+							16, 1);
+			}
+			else if (*format == '%')
+				printed_chars += write(1, "%", 1);
 			format++;
 		}
+		else
+			printed_chars += write(1, format++, 1);
 	}
 	va_end(args);
 	return (printed_chars);
 }
 
-int main() {
+/*int main() {
     // Character Tests
-    /*printf("%%c Tests:\n");
+    printf("%%c Tests:\n");
     printf("Standard: |%c|\n", 'A');
     ft_printf("Custom:   |%c|\n", 'A');
-
-	char c = 'A';
-	printf("%c\n", 'c');
-	ft_printf("%c\n", 'c');
-	printf("%c\n", c);
-	ft_printf("%c\n", c);
 
     // String Tests
     printf("%%s Tests:\n");
@@ -250,18 +207,10 @@ int main() {
 	ft_printf("Custom:   %d %u %x %p\n", INT_MIN, ULONG_MAX, LLONG_MIN, NULL);
 
 	printf("%%\n");
-	ft_printf("%%\n");*/
+	ft_printf("%%\n");
 
-	int a, b, c;
+	printf("%p\n", NULL);
+	ft_printf("%p\n", NULL);
 
-	a = ft_strlen(ft_itoa(88)) + 1;
-	ft_itoa(8832356961);
-	printf("\n");
-	printf("%d\n", a);
-
-	c = printf("%d\n", 8832356961);
-	printf("%d\n", c);
-	b = ft_printf("%d\n", 8832356961);
-	printf("%d\n", b);
     return 0;
-}
+}*/
