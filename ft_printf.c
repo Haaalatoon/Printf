@@ -19,12 +19,13 @@
 
 static int	handle_cors(va_list args, char id)
 {
+	char	c;
 	char	*s;
 
 	if (id == 'c')
 	{
-		ft_putchar_fd((char)va_arg(args, int), 1);
-		return (1);
+		c = (char)va_arg(args, int);
+		return (write(1, &c, 1));
 	}
 	else if (id == 's')
 	{
@@ -33,7 +34,7 @@ static int	handle_cors(va_list args, char id)
 			return (write(1, "(null)", 6));
 		else
 		{
-			ft_putstr_fd(s, 1);
+			ft_putstr(s);
 			return (ft_strlen(s));
 		}
 	}
@@ -174,11 +175,11 @@ int	ft_printf(const char *format, ...)
 	ft_printf("Custom:   %d %u %x %p\n", INT_MIN, ULONG_MAX, LLONG_MIN, NULL);
 	printf("%%\n");
 	ft_printf("%%\n");
-
 	printf(" %p \n", -1);
 	ft_printf(" %p \n", -1);
 	return 0;
 }
+
 int main(){
     // Character tests
     printf("--- Character Tests ---\n");

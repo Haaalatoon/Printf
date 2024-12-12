@@ -14,8 +14,7 @@ CC = cc
 FLAGS = -Wall -Wextra -Werror
 
 SRCS = ft_printf.c\
-	ft_putchar_fd.c\
-	ft_putstr_fd.c\
+	ft_putstr.c\
 	ft_strlen.c\
 
 OBJS = $(SRCS:.c=.o)

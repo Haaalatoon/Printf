@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putchar_fd.c                                    :+:      :+:    :+:   */
+/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrhilane <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/12 00:40:25 by hrhilane          #+#    #+#             */
-/*   Updated: 2024/12/12 00:40:26 by hrhilane         ###   ########.fr       */
+/*   Created: 2024/12/12 00:40:32 by hrhilane          #+#    #+#             */
+/*   Updated: 2024/12/12 00:40:33 by hrhilane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-void	ft_putchar_fd(char c, int fd)
+void	ft_putstr(char *s)
 {
-	write(fd, &c, 1);
+	if (s != NULL)
+		write(1, s, ft_strlen(s));
 }
