@@ -123,7 +123,7 @@ int	ft_printf(const char *format, ...)
 	return (printed_chars);
 }
 
-int	main(void)
+/*int	main(void)
 {
 	int		a;
 	float	x;
@@ -179,7 +179,7 @@ int	main(void)
 	ft_printf(" %p \n", -1);
 	return 0;
 }
-/*
+int main(){
     // Character tests
     printf("--- Character Tests ---\n");
     int ft_ret = ft_printf("Char test: %c\n", 'A');
