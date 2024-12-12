@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrhilane <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/10 17:57:15 by hrhilane          #+#    #+#             */
-/*   Updated: 2024/11/18 12:28:36 by hrhilane         ###   ########.fr       */
+/*   Created: 2024/12/12 00:40:25 by hrhilane          #+#    #+#             */
+/*   Updated: 2024/12/12 00:40:26 by hrhilane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ft_printf.h"
 
 void	ft_putchar_fd(char c, int fd)
 {
