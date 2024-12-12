@@ -88,10 +88,8 @@ static int	handle_dicxup(va_list args, char format)
 		if (addr == NULL)
 			return (write(1, "(nil)", 5));
 		else
-		{
-			write(1, "0x", 2);
-			return (2 + write_number((unsigned long long)addr, 'x', 16));
-		}
+			return (write(1, "0x", 2)
+				+ write_number((unsigned long long)addr, 'x', 16));
 	}
 	return (0);
 }
