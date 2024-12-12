@@ -11,28 +11,31 @@
 # **************************************************************************** #
 
 NAME = libftprintf.a
-SRCS = ft_printf.c\
-	ft_putchar_fd.c\
-	ft_putstr_fd.c\
-	ft_strlen.c\
-
+SRCS = ft_printf.c
 OBJS = $(SRCS:.c=.o)
+LIBFT_DIR = libft
+LIBFT = $(LIBFT_DIR)/libft.a
 CC = cc
 FLAGS = -Wall -Wextra -Werror
 
-$(NAME): $(OBJS)
-	ar rcs $(NAME) $(OBJS)
+all: $(LIBFT) $(NAME)
 
-all: $(NAME)
+$(LIBFT):
+	make -C $(LIBFT_DIR)
+
+$(NAME): $(OBJS) $(LIBFT)
+	ar rcs $(NAME) $(OBJS) $(LIBFT)
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
+	make -C $(LIBFT_DIR) clean
 
 fclean: clean
 	rm -f $(NAME)
+	make -C $(LIBFT_DIR) fclean
 
 re: fclean all
 

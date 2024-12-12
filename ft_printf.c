@@ -177,11 +177,9 @@ int	main(void)
 
 	printf(" %p \n", -1);
 	ft_printf(" %p \n", -1);
-	
-	return (0);
+	return 0;
 }
-/*int main()
-{
+/*
     // Character tests
     printf("--- Character Tests ---\n");
     int ft_ret = ft_printf("Char test: %c\n", 'A');
