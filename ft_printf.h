@@ -21,7 +21,5 @@
 # include <unistd.h>
 
 int		ft_printf(const char *format, ...);
-void	ft_putstr(char *s);
-size_t	ft_strlen(const char *str);
 
 #endif

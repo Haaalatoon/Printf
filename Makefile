@@ -10,12 +10,10 @@
 #                                                                              #
 # **************************************************************************** #
 
-CC = cc
+CC = gcc
 FLAGS = -Wall -Wextra -Werror
 
-SRCS = ft_printf.c\
-	ft_putstr.c\
-	ft_strlen.c\
+SRCS = ft_printf.c
 
 OBJS = $(SRCS:.c=.o)
 
